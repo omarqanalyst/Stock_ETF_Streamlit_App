@@ -1,9 +1,3 @@
-# Ignore the data source file
-ETF_SOCL_Holdings.csv
-
-# Ignore the data source file
-ETF_SOCL_Holdings.csv
-
 # Ignore Python cache files
 __pycache__/
 *.py[cod]
