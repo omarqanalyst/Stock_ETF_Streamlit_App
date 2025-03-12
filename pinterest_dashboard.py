@@ -26,18 +26,6 @@ def main():
     st.sidebar.markdown("This dashboard analyzes Pinterest's stock performance against publicly traded peers, using the SOCL ETF and its holdings as benchmarks.")
 
     st.sidebar.header("Controls")
-    tickers = df['ticker'].unique()
-
-    # Convert tickers to a list for easier index lookup
-    tickers_list = list(tickers)
-
-    # Determine the default index for "PINS" and "RDDT"
-    default_index = tickers_list.index("PINS") if "PINS" in tickers_list else 0
-    competitor_index = tickers_list.index("RDDT") if "RDDT" in tickers_list else (1 if len(tickers_list) > 1 else 0)
-
-    selected_ticker = st.sidebar.selectbox('Select Your Stock', tickers, index=default_index)
-    competitor_ticker = st.sidebar.selectbox('Select Competitor Stock', tickers, index=competitor_index)    
-
 
 
     st.sidebar.header("Data Architecture & Foundations")
@@ -56,9 +44,20 @@ def main():
     """)
 
 
+    tickers = df['ticker'].unique()
+
+    # Convert tickers to a list for easier index lookup
+    tickers_list = list(tickers)
+
+    # Determine the default index for "PINS" and "RDDT"
+    default_index = tickers_list.index("PINS") if "PINS" in tickers_list else 0
+    competitor_index = tickers_list.index("RDDT") if "RDDT" in tickers_list else (1 if len(tickers_list) > 1 else 0)
+
+    selected_ticker = st.sidebar.selectbox('Select Your Stock', tickers, index=default_index)
+    competitor_ticker = st.sidebar.selectbox('Select Competitor Stock', tickers, index=competitor_index)    
+
     
-    
-    st.title(":primary[Pinterest] Stock Market Analytics: SOCL ETF Insights")
+    st.title(":primary[Pinterest] Stock Market Analytics: SOCL ETF Insights", help="Analysis moves from macro to micro, starting with peer comparisons and then focusing on Pinterest")
  
     st.markdown(
         """
