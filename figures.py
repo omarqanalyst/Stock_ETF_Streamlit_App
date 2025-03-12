@@ -126,7 +126,7 @@ def create_price_chart(ticker_data, selected_ticker, high_52w, low_52w):
 
     # 50-Day Moving Average Line
     if len(ticker_data) >= 50:
-        ticker_data['50d_MA'] = ticker_data['close'].rolling(window=50).mean()
+        ticker_data.loc[:, '50d_MA'] = ticker_data['close'].rolling(window=50).mean()
         fig.add_trace(go.Scatter(
             x=ticker_data['date'], y=ticker_data['50d_MA'],
             mode='lines', name='50-Day MA', line=dict(color='#ffcc00', dash='dot'),
@@ -135,7 +135,7 @@ def create_price_chart(ticker_data, selected_ticker, high_52w, low_52w):
 
     # 200-Day Moving Average Line
     if len(ticker_data) >= 200:
-        ticker_data['200d_MA'] = ticker_data['close'].rolling(window=200).mean()
+        ticker_data.loc[:, '200d_MA'] = ticker_data['close'].rolling(window=200).mean()
         fig.add_trace(go.Scatter(
             x=ticker_data['date'], y=ticker_data['200d_MA'],
             mode='lines', name='200-Day MA', line=dict(color='#ff6666', dash='dot'),
