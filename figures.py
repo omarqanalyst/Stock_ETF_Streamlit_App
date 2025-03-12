@@ -113,7 +113,7 @@ def create_price_chart(ticker_data, selected_ticker, high_52w, low_52w):
     last_52_weeks_start = ticker_data['date'].max() - pd.Timedelta(weeks=52)
 
     # Filter data to include only the last 52 weeks
-    recent_data = ticker_data[ticker_data['date'] >= last_52_weeks_start]
+    recent_data = ticker_data[ticker_data['date'] >= last_52_weeks_start].copy()
 
     fig = go.Figure()
 

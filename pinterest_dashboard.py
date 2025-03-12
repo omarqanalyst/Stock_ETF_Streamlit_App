@@ -2,6 +2,7 @@
 # dashboard.py
 import streamlit as st
 import pandas as pd
+from dynamic_paragraph_momentum import generate_trade_advice
 
 from data_utils import load_data, calculate_mutual_dates, calculate_correlation_matrix, calculate_52_week_high_low, calculate_relative_strength, calculate_moving_averages
 from forecasting import create_volatility_forecast
@@ -128,6 +129,23 @@ def main():
     st.subheader("Historical Price Trend", help="An interactive line chart showing historical closing prices, incorporating key momentum benchmarks")
     price_chart_fig = create_price_chart(ticker_data, selected_ticker, high_52w, low_52w)
     st.plotly_chart(price_chart_fig, use_container_width=True)
+
+    # --- Add dynamic trade advice paragraph below the price chart ---
+    recent_high_3d = ticker_data['high'].tail(3).max()
+    cp_below_50_consecutive = False  # Replace with actual logic if available.
+    action, advice_message = generate_trade_advice(
+        CP=latest_close,
+        ma50=moving_averages.get(50, latest_close),
+        ma200=moving_averages.get(200, latest_close),
+        wk52_high=high_52w,
+        wk52_low=low_52w,
+        recent_high_3d=recent_high_3d,
+        cp_below_50_consecutive=cp_below_50_consecutive
+    )
+
+    # Add the blue bold text
+    st.markdown(f":blue[**Recommended Action**]: {action}", help="Dynamic Analysis: Implementing Kragger's principles in Python")
+    st.markdown(advice_message)
 
     # Load Theme Colors
     secondary_bg = theme_colors["secondary_bg"]
