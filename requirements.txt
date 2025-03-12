@@ -3,7 +3,6 @@ cmdstanpy==1.2.5
 dask==2.10.1
 jsonpointer==2.1
 matplotlib==3.9.2
-mkl-service==2.4.0
 ply==3.11
 prophet==1.1.6
 PyQt5==5.15.10
