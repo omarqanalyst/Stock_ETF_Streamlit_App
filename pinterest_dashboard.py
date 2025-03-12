@@ -3,6 +3,7 @@
 import streamlit as st
 import pandas as pd
 from dynamic_paragraph_momentum import generate_trade_advice
+from dynamic_paragraph_forecasting import generate_forecasting_advice
 
 from data_utils import load_data, calculate_mutual_dates, calculate_correlation_matrix, calculate_52_week_high_low, calculate_relative_strength, calculate_moving_averages
 from forecasting import create_volatility_forecast
@@ -27,6 +28,17 @@ def main():
     st.sidebar.markdown("This dashboard analyzes Pinterest's stock performance against publicly traded peers, using the SOCL ETF and its holdings as benchmarks.")
 
     st.sidebar.header("Controls")
+    
+    tickers = df['ticker'].unique()
+
+    # Convert tickers to a list for easier index lookup
+    tickers_list = list(tickers)
+    # Determine the default index for "PINS" and "RDDT"
+    default_index = tickers_list.index("PINS") if "PINS" in tickers_list else 0
+    competitor_index = tickers_list.index("RDDT") if "RDDT" in tickers_list else (1 if len(tickers_list) > 1 else 0)
+
+    selected_ticker = st.sidebar.selectbox('Select Your Stock', tickers, index=default_index)
+    competitor_ticker = st.sidebar.selectbox('Select Competitor Stock', tickers, index=competitor_index)    
 
 
     st.sidebar.header("Data Architecture & Foundations")
@@ -45,17 +57,9 @@ def main():
     """)
 
 
-    tickers = df['ticker'].unique()
 
-    # Convert tickers to a list for easier index lookup
-    tickers_list = list(tickers)
 
-    # Determine the default index for "PINS" and "RDDT"
-    default_index = tickers_list.index("PINS") if "PINS" in tickers_list else 0
-    competitor_index = tickers_list.index("RDDT") if "RDDT" in tickers_list else (1 if len(tickers_list) > 1 else 0)
 
-    selected_ticker = st.sidebar.selectbox('Select Your Stock', tickers, index=default_index)
-    competitor_ticker = st.sidebar.selectbox('Select Competitor Stock', tickers, index=competitor_index)    
 
     
     st.title(":primary[Pinterest] Stock Market Analytics: SOCL ETF Insights", help="Analysis moves from macro to micro, starting with peer comparisons and then focusing on Pinterest")
@@ -102,10 +106,15 @@ def main():
     st.plotly_chart(corr_fig, use_container_width=True)
     
     # Volatility Forecasting Section
-    st.header("Volatility Forecasting", help="Provides early warnings of price swings for proactive hedging, using the Prophet model with additive seasonality")
+    st.header("Volatility Forecasting", help="Provides early warnings of price swings using the Prophet model")
     if not selected_data.empty:
-        forecast_fig = create_volatility_forecast(selected_data)
+        forecast_fig, forecast_df = create_volatility_forecast(selected_data)
         st.plotly_chart(forecast_fig, use_container_width=True)
+
+        forecast_action, forecast_advice, last_date = generate_forecasting_advice(forecast_df, selected_data)
+        st.markdown(f":blue[**Recommended Action**]: {forecast_action}", help="Dynamic Analysis for Volatility Forecast")
+        st.markdown(forecast_advice)
+
     
     # Ticker Overview Section: Price Chart and Key Metrics
     st.header("Ticker Overview: Pinterest", help="Provides stakeholders with a snapshot of performance and risk metrics")

@@ -80,5 +80,6 @@ def create_volatility_forecast(data, periods=90):
         height=500  # Increased figure height
     )
 
+   
     
-    return fig
+    return fig, forecast
