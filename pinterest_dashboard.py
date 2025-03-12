@@ -112,7 +112,7 @@ def main():
         st.plotly_chart(forecast_fig, use_container_width=True)
 
         forecast_action, forecast_advice, last_date = generate_forecasting_advice(forecast_df, selected_data)
-        st.markdown(f":blue[**Recommended Action**]: {forecast_action}", help="Dynamic Analysis for Volatility Forecast")
+        st.markdown(f":blue[**Recommended Action**]: {forecast_action}", help="Dynamic Analysis for Volatility Forecast. Dates and values are dynamic")
         st.markdown(forecast_advice)
 
     
