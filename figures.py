@@ -16,45 +16,46 @@ def create_normalized_price_figure(selected_data, competitor_data, benchmark_dat
 
     fig.add_trace(go.Scatter(
         x=selected_data['date'], y=selected_data['normalized_close'],
-        name=selected_ticker, line=dict(color=theme_colors["primary"])
+        name=selected_ticker, line=dict(color=theme_colors["primary"]),
+        hovertemplate='Normalized Price: %{y:.2f}<extra></extra>'
     ))
     fig.add_trace(go.Scatter(
         x=competitor_data['date'], y=competitor_data['normalized_close'],
-        name=competitor_ticker, line=dict(color='#BE8A09')
+        name=competitor_ticker, line=dict(color='#BE8A09'),
+        hovertemplate='Normalized Price: %{y:.2f}<extra></extra>'
     ))
     fig.add_trace(go.Scatter(
         x=benchmark_data['date'], y=benchmark_data['normalized_close'],
-        name=benchmark_ticker, line=dict(color='gray')
+        name=benchmark_ticker, line=dict(color='gray'),
+        hovertemplate='Normalized Price: %{y:.2f}<extra></extra>'
     ))
 
-    fig.update_traces(
-        hovertemplate='Date: %{x|%Y-%m-%d}<br>Normalized Price: %{y:.2f}<extra></extra>'
-    )
-
-    # Increase text size in layout
+    # Increase text size in layout, set x-axis hoverformat and add unified hover mode
     fig.update_layout(
         title=dict(
             text=f'Normalized Price Comparison: {selected_ticker} vs {competitor_ticker} vs {benchmark_ticker}',
-            font=dict(size=24)  # Increase title font size
+            font=dict(size=24)
         ),
         xaxis=dict(
             title="Date",
-            titlefont=dict(size=18),  # Increase x-axis title font size
-            tickfont=dict(size=16)  # Increase x-axis tick font size
+            titlefont=dict(size=18),
+            tickfont=dict(size=16),
+            hoverformat='%Y-%m-%d'  # Format x value in hover label
         ),
         yaxis=dict(
             title="Normalized Price",
-            titlefont=dict(size=18),  # Increase y-axis title font size
-            tickfont=dict(size=16)  # Increase y-axis tick font size
+            titlefont=dict(size=18),
+            tickfont=dict(size=16)
         ),
         legend=dict(
-            font=dict(size=16)  # Increase legend font size
+            font=dict(size=16)
         ),
         hoverlabel=dict(
-            font_size=14  # Increase hover text font size
+            font_size=14
         ),
-        width=1200,  # Increase figure width
-        height=400  # Increase figure height
+        width=1200,
+        height=400,
+        hovermode='x unified'
     )
 
     return fig
