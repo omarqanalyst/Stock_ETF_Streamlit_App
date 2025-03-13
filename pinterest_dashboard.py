@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 from dynamic_paragraph_momentum import generate_trade_advice
 from dynamic_paragraph_forecasting import generate_forecasting_advice
+from dynamic_paragraph_correlation import generate_correlation_advice
 
 from data_utils import load_data, calculate_mutual_dates, calculate_correlation_matrix, calculate_52_week_high_low, calculate_relative_strength, calculate_moving_averages
 from forecasting import create_volatility_forecast
@@ -66,12 +67,10 @@ def main():
  
     st.markdown(
         """
-        <style>
-        /* Target the tooltip container rendered by Base Web */
-        .stTooltipContent{
-            background-color: #CDECE4 !important;  /* desired background color */
-            color: #1C6B6C !important;              /* adjust text color if needed */
-            border: 1px solid #ccc;               /* optional border */
+        <style> 
+        /* Ensure the first th element's div within the table has a width of 10rem */
+        table tbody tr th:first-child {
+            width: 10rem !important;
         }
         </style>
         """,
@@ -105,6 +104,22 @@ def main():
     corr_fig = create_correlation_matrix_figure(corr_matrix)
     st.plotly_chart(corr_fig, use_container_width=True)
     
+    top_table, bottom_table, error_msg = generate_correlation_advice(corr_matrix, selected_ticker)
+    if error_msg:
+        st.warning(error_msg)
+    else:
+        st.subheader(f"Correlation Summary for {selected_ticker}")
+        
+        # Use custom styled headers with your desired hex colors
+        st.markdown("<h4 style='color: #477A58;'>Highest Correlation</h4>", unsafe_allow_html=True)
+        st.table(top_table)
+        
+        st.markdown("<h4 style='color: #D64519 ;'>Lowest Correlation</h4>", unsafe_allow_html=True)
+        st.table(bottom_table)
+
+    
+
+
     # Volatility Forecasting Section
     st.header("Volatility Forecasting", help="Provides early warnings of price swings using the Prophet model")
     if not selected_data.empty:
