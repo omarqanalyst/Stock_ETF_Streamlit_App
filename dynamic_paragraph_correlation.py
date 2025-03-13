@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 
 def generate_correlation_advice(corr_matrix, selected_ticker):
     """
@@ -11,27 +12,32 @@ def generate_correlation_advice(corr_matrix, selected_ticker):
     Returns:
         tuple: (top_table DataFrame, bottom_table DataFrame, error message or None)
     """
-    if selected_ticker not in corr_matrix.index:
+    selected_corr = corr_matrix.get(selected_ticker)
+    if selected_corr is None:
         return None, None, "Correlation data is not available for the selected ticker."
     
-    correlations = corr_matrix.loc[selected_ticker].drop([selected_ticker, 'SOCL'], errors='ignore')
+    try:
+        correlations = corr_matrix.loc[selected_ticker].drop([selected_ticker, 'SOCL'])
+    except KeyError as e:
+        return None, None, f"Error: {e} - It looks like a column name might be misspelled or missing."
+    
     if correlations.empty:
         return None, None, "Not enough data available to compare correlations."
     
-    # Get top 3 and bottom 3 correlations rounded to two decimals
-    top_3_corr = correlations.nlargest(3).round(2)
-    bottom_3_corr = correlations.nsmallest(3).round(2)
+    num_correlations = 3  # Number of correlations to retrieve
+    # Get top and bottom correlations rounded to two decimals
+    top_corr = correlations.nlargest(num_correlations).round(2)
+    bottom_corr = correlations.nsmallest(num_correlations).round(2)
     
     # Build top table with combined ticker and correlation values
     top_table = pd.DataFrame({
-        'Ticker': top_3_corr.index,
-        'Correlation': top_3_corr.values
+        'Ticker': top_corr.index,
+        'Correlation': top_corr.values
     })
     top_table = top_table.sort_values(by='Correlation', ascending=False)
     top_table['Correlation'] = top_table['Correlation'].map('{:.2f}'.format)
     
-    # Create combined column in the format "TICKER (0.XX)"
-    top_table['Combined'] = top_table['Ticker'] + ' (' + top_table['Correlation'] + ')'
+    top_table['Combined'] = top_table.apply(lambda row: f"{row['Ticker']} ({row['Correlation']})", axis=1)
     
     # Keep only the Combined column and rename it
     top_table = top_table[['Combined']]
@@ -44,14 +50,13 @@ def generate_correlation_advice(corr_matrix, selected_ticker):
     
     # Build bottom table with combined ticker and correlation values
     bottom_table = pd.DataFrame({
-        'Ticker': bottom_3_corr.index,
-        'Correlation': bottom_3_corr.values
+        'Ticker': bottom_corr.index,
+        'Correlation': bottom_corr.values
     })
     bottom_table = bottom_table.sort_values(by='Correlation', ascending=True)
     bottom_table['Correlation'] = bottom_table['Correlation'].map('{:.2f}'.format)
     
-    # Create combined column in the format "TICKER (0.XX)"
-    bottom_table['Combined'] = bottom_table['Ticker'] + ' (' + bottom_table['Correlation'] + ')'
+    bottom_table['Combined'] = bottom_table.apply(lambda row: f"{row['Ticker']} ({row['Correlation']})", axis=1)
     
     # Keep only the Combined column and rename it
     bottom_table = bottom_table[['Combined']]
@@ -72,7 +77,6 @@ def display_correlation_tables(top_str, bottom_str):
         top_str (str): Formatted text for top correlations (e.g., "SNAP (0.38) META (0.29) YALA (0.27)")
         bottom_str (str): Formatted text for lowest correlations (similar format)
     """
-    import streamlit as st
     
     st.markdown(f"**Top Correlations:**  {top_str}")
     st.markdown(f"**Lowest Correlations:**  {bottom_str}")
