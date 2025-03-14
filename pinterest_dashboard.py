@@ -25,7 +25,7 @@ def main():
     earliest_mutual_date, latest_mutual_date = calculate_mutual_dates(df)
     
     # Sidebar controls for user input
-    st.sidebar.header("Stock Market Analytics Dashboard")
+    st.sidebar.header("Stock Market Analytics Dashboard by :primary[Omar Quintana]")
     st.sidebar.markdown("This dashboard analyzes Pinterest's stock performance against publicly traded peers, using the SOCL ETF and its holdings as benchmarks.")
 
     st.sidebar.header("Controls")
