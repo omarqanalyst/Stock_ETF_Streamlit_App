@@ -1,85 +1,91 @@
-def generate_trade_advice(CP, ma50, ma200, wk52_high, wk52_low, recent_high_3d=None, cp_below_50_consecutive=False):
+def generate_trade_advice(
+    closing_price,
+    fifty_day_ma,
+    two_hundred_day_ma,
+    wk52_high,
+    wk52_low,
+    recent_3d_high=None,
+    below_50dma_3days=False
+):
     """
     Generate a dynamic recommendation string and an action label based on momentum trading rules without volume data.
-    
-    Parameters:
-        CP (float): Current closing price.
-        ma50 (float): 50-day moving average.
-        ma200 (float): 200-day moving average.
-        wk52_high (float): 52-week high.
-        wk52_low (float): 52-week low.
-        recent_high_3d (float, optional): The highest closing price over the past 3 days.
-        cp_below_50_consecutive (bool): True if CP has closed below the 50DMA for three consecutive days.
-        
-    Returns:
-        tuple: (action, message)
-            action (str): One of "BUY", "SELL", "WAIT", or "HOLD".
-            message (str): Recommendation explanation without explicit “BUY”/“SELL” labels.
     """
+
     wk52_range = wk52_high - wk52_low
     wk52_midpoint = wk52_low + 0.5 * wk52_range
-    
+
     action = "HOLD"
-    message = ""  # Explanation text
+    message = ""
 
-    # --- Buy Conditions (Uptrend Confirmation) ---
-    if ma50 > ma200 and CP > ma50 and CP > ma200:
-        if CP >= wk52_high * 1.02 and CP >= wk52_low + 0.9 * wk52_range:
+    uptrend = fifty_day_ma > two_hundred_day_ma and closing_price > fifty_day_ma and closing_price > two_hundred_day_ma
+    bullish_breakout = closing_price >= wk52_high * 1.02 and closing_price >= wk52_low + 0.9 * wk52_range
+
+    # --- Uptrend scenarios ---
+    if uptrend:
+        if bullish_breakout:
             action = "BUY"
             message = (
-                f"The 50-day moving average ({ma50:.2f}) is above the 200-day average ({ma200:.2f}), "
-                f"with the closing price ({CP:.2f}) breaking at least 2% above the 52-week high ({wk52_high:.2f}), "
-                "indicating a strong bullish breakout. Consider a stop-loss below the 50-day average."
+                f"STRONG BUY: The 50-day moving average ({fifty_day_ma:.2f}) is above the 200-day average ({two_hundred_day_ma:.2f}), "
+                f"and the closing price ({closing_price:.2f}) broke 2% above the 52-week high ({wk52_high:.2f})."
             )
-        elif CP >= wk52_midpoint:
+        elif closing_price >= wk52_midpoint:
             action = "BUY"
             message = (
-                f"The 50-day moving average ({ma50:.2f}) remains above the 200-day ({ma200:.2f}). "
-                f"The price ({CP:.2f}) is above both and has held above the 52-week midpoint ({wk52_midpoint:.2f}), "
-                "suggesting ongoing bullish momentum. A stop-loss near support may help manage risk."
+                f"MODERATE BUY: The 50-day moving average ({fifty_day_ma:.2f}) remains above the 200-day ({two_hundred_day_ma:.2f}), "
+                f"and the price ({closing_price:.2f}) is above the 52-week midpoint ({wk52_midpoint:.2f}). "
+                "This implies continued positive momentum, though monitoring short-term pullbacks is recommended."
             )
         else:
             action = "WAIT"
             message = (
-                "While price and averages suggest an uptrend, there is no clear breakout or confirmed rebound. "
-                "Monitor for stronger bullish signals before committing."
+                "WAIT: Price and averages suggest an uptrend; however, no clear breakout has formed. "
+                "Keep an eye on price behavior near recent resistance levels for potential entry."
             )
 
-    # --- Sell Conditions (Momentum Breakdown) ---
-    elif (ma50 < ma200 and CP < ma50 and CP < ma200) or (recent_high_3d and CP <= recent_high_3d * 0.95):
-        if (cp_below_50_consecutive or CP < wk52_midpoint) or (recent_high_3d and CP <= recent_high_3d * 0.95):
-            action = "SELL"
-            trigger = []
-            if recent_high_3d and CP <= recent_high_3d * 0.95:
-                trigger.append(f"price is over 5% below the recent high of {recent_high_3d:.2f}")
-            if cp_below_50_consecutive or CP < wk52_midpoint:
-                trigger.append("price remains weak below the 50-day average or 52-week midpoint")
-
-            joined_triggers = " and ".join(trigger)
-            message = (
-                f"The 50-day average ({ma50:.2f}) is below the 200-day ({ma200:.2f}), "
-                f"and the closing price ({CP:.2f}) is under both. Additionally, {joined_triggers}, "
-                "indicating a clear downward shift. Exiting the position now can protect against further losses."
-            )
-        elif CP <= wk52_low * 0.98:
-            action = "SELL"
-            message = (
-                f"The price ({CP:.2f}) is at least 2% below the 52-week low ({wk52_low:.2f}), "
-                "signaling a potential bearish move. Reducing or closing the position may safeguard capital."
-            )
-        else:
+    # --- Ambiguous or bearish scenarios ---
+    elif fifty_day_ma < two_hundred_day_ma:
+        # If price is still above the 50-day, we treat it as ambiguous and WAIT
+        if closing_price >= fifty_day_ma:
             action = "WAIT"
             message = (
-                "Bearish indicators appear, but not conclusively enough for immediate action. "
-                "Watch for further downside confirmation before making a decision."
+                f"WAIT: The 50-day average ({fifty_day_ma:.2f}) is below the 200-day ({two_hundred_day_ma:.2f}), "
+                f"but the closing price ({closing_price:.2f}) remains above the 50-day. "
+                "This setup is ambiguous; monitor for either a breakdown below support or a breakout above resistance"
             )
-
-    # --- Hold Conditions (Sideways or Indecisive Market) ---
+        # Otherwise, check existing strong or moderate sell signals
+        elif (closing_price < fifty_day_ma and closing_price < two_hundred_day_ma) or (
+            recent_3d_high and closing_price <= recent_3d_high * 0.95
+        ):
+            if below_50dma_3days or closing_price < wk52_midpoint:
+                action = "SELL"
+                message = (
+                    f"STRONG SELL: The 50-day average ({fifty_day_ma:.2f}) is below the 200-day ({two_hundred_day_ma:.2f}), "
+                    f"and the closing price ({closing_price:.2f}) indicates a downward shift. "
+                    "Exiting now may prevent deeper losses, but reevaluate if support levels hold."
+                )
+            elif closing_price <= wk52_low * 0.98:
+                action = "SELL"
+                message = (
+                    f"MODERATE SELL: The price ({closing_price:.2f}) is at least 2% below the 52-week low ({wk52_low:.2f}). "
+                    "Signals potential further downside risk."
+                )
+            else:
+                action = "WAIT"
+                message = (
+                    "Momentum shows bearish signs, but not conclusive for an immediate exit. "
+                    "Consider waiting for a clearer breakdown."
+                )
+        else:
+            action = "HOLD"
+            message = (
+                "HOLD: The 50-day is below the 200-day, but current price action doesn’t conclusively confirm more downside. "
+                "Observe whether the trend strengthens or weakens from here."
+            )
     else:
         action = "HOLD"
         message = (
-            f"The closing price ({CP:.2f}) is moving between the 50-day and 200-day averages, "
-            "with momentum remaining neutral. Waiting for a clear breakout or breakdown is prudent."
+            f"The closing price ({closing_price:.2f}) is near the 50-day or 200-day averages, "
+            "suggesting a sideways market."
         )
 
     return action, message

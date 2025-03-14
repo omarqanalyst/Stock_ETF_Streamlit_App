@@ -158,13 +158,13 @@ def main():
     recent_high_3d = ticker_data['high'].tail(3).max()
     cp_below_50_consecutive = False  # Replace with actual logic if available.
     action, advice_message = generate_trade_advice(
-        CP=latest_close,
-        ma50=moving_averages.get(50, latest_close),
-        ma200=moving_averages.get(200, latest_close),
+        closing_price=latest_close,
+        fifty_day_ma=moving_averages.get(50, latest_close),
+        two_hundred_day_ma=moving_averages.get(200, latest_close),
         wk52_high=high_52w,
         wk52_low=low_52w,
-        recent_high_3d=recent_high_3d,
-        cp_below_50_consecutive=cp_below_50_consecutive
+        recent_3d_high=recent_high_3d,
+        below_50dma_3days=cp_below_50_consecutive
     )
 
     # Add the blue bold text
