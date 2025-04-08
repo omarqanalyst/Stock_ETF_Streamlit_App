@@ -1,5 +1,7 @@
 # Pinterest ETF Analysis Dashboard
 
+View here: https://pinterest.streamlit.app/
+
 ![Screenshot 2025-04-08 135813](https://github.com/user-attachments/assets/0a371397-740c-4a21-8329-bca5d870baa8)
 
 This project is a Streamlit dashboard that analyzes Pinterest’s stock performance relative to its peers, using the SOCL ETF as a benchmark.
@@ -22,6 +24,10 @@ This project is a Streamlit dashboard that analyzes Pinterest’s stock performa
 ## Why It Matters
 
 This project demonstrates how to integrate multiple technologies into a single, user-friendly dashboard.
+
+## View the Dashboard
+
+[https://pinterest.streamlit.app/](https://pinterest.streamlit.app/)
 
 
 ## Installation
