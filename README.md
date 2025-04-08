@@ -25,11 +25,6 @@ This project is a Streamlit dashboard that analyzes Pinterest’s stock performa
 
 This project demonstrates how to integrate multiple technologies into a single, user-friendly dashboard.
 
-## View the Dashboard
-
-[https://pinterest.streamlit.app/](https://pinterest.streamlit.app/)
-
-
 ## Installation
 
 Install the required packages with:
