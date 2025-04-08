@@ -1,6 +1,26 @@
 # Pinterest ETF Analysis Dashboard
 
-This project provides a comprehensive dashboard for analyzing Pinterest's stock performance against its peers using the SOCL ETF as a benchmark. Built with Streamlit, it features data loading, preprocessing, and visualization capabilities. Key functionalities include comparative analysis, correlation analysis, volatility forecasting, and key metrics overview. The dashboard leverages AWS services for data storage and processing, including S3, AWS Glue, and AWS Athena.
+This project is a Streamlit dashboard that analyzes Pinterest’s stock performance relative to its peers, using the SOCL ETF as a benchmark.
+
+## Key Features
+
+- **Comparative analysis**: See how Pinterest stacks up against other social media stocks.  
+- **Correlation analysis**: Explore relationships between stock movements.  
+- **Volatility forecasting**: Anticipate potential price swings.  
+- **Key metrics overview**: Get a snapshot of financial and performance indicators.  
+
+## Tech Stack
+
+- **Frontend**: Built with Streamlit for quick development and interactive visuals.  
+- **Data pipeline**:  
+  - Data stored in **AWS S3**  
+  - Processed using **AWS Glue**  
+  - Queried via **AWS Athena**
+
+## Why It Matters
+
+This project demonstrates how to integrate multiple technologies into a single, user-friendly dashboard.
+
 
 ## Installation
 
